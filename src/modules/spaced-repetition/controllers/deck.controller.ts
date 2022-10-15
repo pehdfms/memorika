@@ -10,11 +10,13 @@ import {
   Logger,
   Query
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { PaginationQuery } from 'src/libs/types/common/pagination'
 import { DeckService } from '../domain/services/deck.service'
 import { CreateDeckDto } from '../dtos/create-deck.dto'
 import { UpdateDeckDto } from '../dtos/update-deck.dto'
 
+@ApiTags('Spaced Repetition')
 @Controller('decks')
 export class DeckController {
   private readonly logger = new Logger(DeckService.name)
@@ -22,7 +24,6 @@ export class DeckController {
 
   @Post()
   create(@Body() createDeckDto: CreateDeckDto) {
-    this.logger.log(createDeckDto)
     return this.deckService.create(createDeckDto)
   }
 

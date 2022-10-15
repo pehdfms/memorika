@@ -1,11 +1,15 @@
 import { AuditedEntity } from 'src/libs/types/common/entity'
-import { Column, Entity } from 'typeorm'
+import { Column, Entity, OneToMany } from 'typeorm'
+import { FlashCard } from './flash-card.entity'
 
 @Entity()
 export class Deck extends AuditedEntity {
-  @Column({ nullable: false })
+  @Column()
   name: string
 
-  @Column({ nullable: false })
+  @Column()
   description: string
+
+  @OneToMany(() => FlashCard, (flashcard) => flashcard.deck)
+  flashCards: FlashCard[]
 }
