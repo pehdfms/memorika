@@ -1,0 +1,32 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dependencies
+    ports:
+      - ${PORT}:3000
+    depends_on:
+      - postgres
+    volumes:
+      - .:/usr/src/app
+    command: yarn start:dev
+
+  postgres:
+    image: postgres
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'admin@memorika.com'
+      PGADMIN_DEFAULT_PASSWORD: 'admin'
+    ports:
+      - '5050:80'
+    depends_on:
+      - postgres

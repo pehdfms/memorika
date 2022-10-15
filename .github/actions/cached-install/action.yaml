@@ -1,0 +1,19 @@
+name: 'Cached Install'
+description: 'Sets up node and installs cached dependencies'
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/setup-node@v3
+      with:
+        node-version: lts/*
+    - name: Cache Modules
+      id: yarn-cache
+      uses: actions/cache@v2
+      with:
+        path: '**/node_modules'
+        key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+    - name: Install Dependencies
+      shell: bash
+      if: ${{ !steps.yarn-cache.outputs.cache-hit }}
+      run: yarn install --frozen-lockfile
