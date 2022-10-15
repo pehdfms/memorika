@@ -11,7 +11,11 @@ export class AbstractEntity {
 }
 
 export class AuditedEntity extends AbstractEntity {
-  @CreateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({
+    type: 'timestamp with time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+    update: false
+  })
   created: Date
 
   @UpdateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
@@ -20,5 +24,5 @@ export class AuditedEntity extends AbstractEntity {
 
 export class SoftDeleteEntity extends AbstractEntity {
   @DeleteDateColumn({ type: 'timestamp with time zone' })
-  removed: Date
+  removed?: Date
 }

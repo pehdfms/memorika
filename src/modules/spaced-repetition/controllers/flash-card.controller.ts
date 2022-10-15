@@ -11,7 +11,7 @@ import {
   Query
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { PaginationQuery } from 'src/libs/types/common/pagination'
+import { PaginationQuery } from 'src/libs/types/pagination'
 import { FlashCardService } from '../domain/services/flash-card.service'
 import { CreateFlashCardDto } from '../dtos/create-flash-card.dto'
 import { UpdateFlashCardDto } from '../dtos/update-flash-card.dto'

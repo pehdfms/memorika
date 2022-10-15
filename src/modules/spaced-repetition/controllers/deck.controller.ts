@@ -8,10 +8,12 @@ import {
   Delete,
   ParseUUIDPipe,
   Logger,
-  Query
+  Query,
+  HttpCode,
+  HttpStatus
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { PaginationQuery } from 'src/libs/types/common/pagination'
+import { PaginationQuery } from 'src/libs/types/pagination'
 import { DeckService } from '../domain/services/deck.service'
 import { CreateDeckDto } from '../dtos/create-deck.dto'
 import { UpdateDeckDto } from '../dtos/update-deck.dto'
@@ -43,6 +45,7 @@ export class DeckController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.deckService.remove(id)
   }

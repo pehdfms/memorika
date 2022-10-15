@@ -1,5 +1,5 @@
 import { IsDefined, IsUUID } from 'class-validator'
-import { PaginationQuery } from 'src/libs/types/common/pagination'
+import { PaginationQuery } from 'src/libs/types/pagination'
 
 export class PaginatedFlashCardQuery extends PaginationQuery {
   @IsDefined()

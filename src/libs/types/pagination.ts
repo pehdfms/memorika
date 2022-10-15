@@ -18,7 +18,19 @@ export class PaginationQuery {
   perPage: number = 20
 }
 
-export interface PaginationResponse<T> {
+export class PaginationResponse<T> {
+  constructor(query: PaginationQuery, total: number, data: T[]) {
+    const { page, perPage } = query
+
+    this.data = data
+    this.page = {
+      perPage: +perPage,
+      totalItems: total,
+      totalPages: Math.ceil(total / perPage),
+      current: +page
+    }
+  }
+
   data: T[]
   page: {
     perPage: number

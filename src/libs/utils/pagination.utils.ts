@@ -1,4 +1,4 @@
-import { PaginationQuery } from '../types/common/pagination'
+import { PaginationQuery } from '../types/pagination'
 
 export function getPaginationOptions(query: PaginationQuery) {
   const { page, perPage } = query
@@ -6,18 +6,5 @@ export function getPaginationOptions(query: PaginationQuery) {
   return {
     take: +perPage,
     skip: page * perPage
-  }
-}
-
-export function getPaginationResult(query: PaginationQuery, total: number) {
-  const { page, perPage } = query
-
-  return {
-    page: {
-      perPage: +perPage,
-      totalItems: total,
-      totalPages: Math.ceil(total / perPage),
-      current: +page
-    }
   }
 }
