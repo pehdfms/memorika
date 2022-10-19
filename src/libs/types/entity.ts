@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto'
 import {
   CreateDateColumn,
   DeleteDateColumn,
@@ -6,11 +7,22 @@ import {
 } from 'typeorm'
 
 export class AbstractEntity {
+  constructor() {
+    this.id = randomUUID()
+  }
+
   @PrimaryGeneratedColumn('uuid')
   id: string
 }
 
 export class AuditedEntity extends AbstractEntity {
+  constructor() {
+    super()
+
+    this.created = new Date()
+    this.updated = new Date()
+  }
+
   @CreateDateColumn({
     type: 'timestamp with time zone',
     default: () => 'CURRENT_TIMESTAMP',

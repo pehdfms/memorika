@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { PaginationResponse } from 'src/libs/types/pagination'
 import { getPaginationOptions } from 'src/libs/utils/pagination.utils'
 import { ObjectLiteral, Repository } from 'typeorm'
-import { DeepCreateFlashCardDto } from '../../dtos/deep-create-flash-card.dto'
+import { CreateFlashCardDto } from '../../dtos/create-flash-card.dto'
 import { FlashCardQueryDto } from '../../dtos/flash-card-query.dto'
 import { PaginatedFlashCardQuery } from '../../dtos/paginated-flash-card-query.dto'
 import { UpdateFlashCardDto } from '../../dtos/update-flash-card.dto'
@@ -19,9 +19,10 @@ export class FlashCardService {
     private readonly deckService: DeckService
   ) {}
 
-  async create(createFlashCardDto: DeepCreateFlashCardDto): Promise<ObjectLiteral> {
-    const deck = await this.deckService.findOne(createFlashCardDto.deck)
-    return (await this.flashCardRepository.insert({ ...createFlashCardDto, deck })).generatedMaps[0]
+  async create(createFlashCardDto: CreateFlashCardDto, deckId: string): Promise<FlashCard> {
+    const deck = await this.deckService.findOne(deckId)
+    return (await this.flashCardRepository.insert({ ...createFlashCardDto, deck }))
+      .generatedMaps[0] as FlashCard
   }
 
   async findAll(query: PaginatedFlashCardQuery): Promise<PaginationResponse<FlashCard>> {
@@ -41,7 +42,7 @@ export class FlashCardService {
   }
 
   async findOne({ deck, id }: FlashCardQueryDto): Promise<FlashCard> {
-    return await this.flashCardRepository.findOne({
+    const result = await this.flashCardRepository.findOne({
       where: {
         id,
         deck: {
@@ -49,24 +50,39 @@ export class FlashCardService {
         }
       }
     })
+
+    if (!result) {
+      throw new NotFoundException()
+    }
+
+    return result
   }
 
   async update(
     { deck, id }: FlashCardQueryDto,
     updateFlashCardDto: UpdateFlashCardDto
   ): Promise<ObjectLiteral> {
-    if (!this.findOne({ deck, id })) {
+    const result = (
+      await this.flashCardRepository
+        .createQueryBuilder()
+        .update(updateFlashCardDto)
+        .where({ id, deck: { id: deck } })
+        .returning('*')
+        .execute()
+    ).raw[0]
+
+    if (!result) {
       throw new NotFoundException()
     }
 
-    return (await this.flashCardRepository.update(id, updateFlashCardDto)).generatedMaps[0]
+    return result
   }
 
   async remove({ deck, id }: FlashCardQueryDto): Promise<void> {
-    if (!this.findOne({ deck, id })) {
+    const result = await this.flashCardRepository.delete({ id, deck: { id: deck } })
+
+    if (result.affected === 0) {
       throw new NotFoundException()
     }
-
-    await this.flashCardRepository.delete(id)
   }
 }

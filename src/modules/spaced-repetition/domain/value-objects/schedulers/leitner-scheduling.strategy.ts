@@ -1,12 +1,12 @@
 import { FlashCard } from '../../entities/flash-card.entity'
-import { Repetition } from '../../entities/repetition.entity'
-import { FlashCardSchedulingStrategy } from './flash-card-scheduling.strategy'
+import { Review } from '../../entities/review.entity'
+import { SchedulingStrategy } from './scheduling.strategy'
 
-export class LeitnerScheduler implements FlashCardSchedulingStrategy {
+export class LeitnerScheduler implements SchedulingStrategy {
   private delayPerBoxInDays = 1
 
   schedule(flashCard: FlashCard): Date {
-    return this.convertBoxToDate(this.getNextBox(flashCard.repetitions))
+    return this.convertBoxToDate(this.getNextBox(flashCard.reviews))
   }
 
   private convertBoxToDate(box: number): Date {
@@ -16,7 +16,7 @@ export class LeitnerScheduler implements FlashCardSchedulingStrategy {
     return resultingDate
   }
 
-  private getNextBox(repetitions: Repetition[]): number {
+  private getNextBox(repetitions: Review[]): number {
     // Simple streak algorithm, if we miss a repetition
     // reset the streak to zero, otherwise add one.
     return repetitions.reduce(

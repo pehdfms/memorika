@@ -14,7 +14,7 @@ export class DeckService {
   constructor(@InjectRepository(Deck) private readonly deckRepository: Repository<Deck>) {}
 
   async create(createDeckDto: CreateDeckDto): Promise<Deck> {
-    return await this.deckRepository.save(createDeckDto)
+    return (await this.deckRepository.insert(createDeckDto)).generatedMaps[0] as Deck
   }
 
   async findAll(query: PaginationQuery): Promise<PaginationResponse<Deck>> {

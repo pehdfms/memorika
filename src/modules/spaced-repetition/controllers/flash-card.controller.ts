@@ -8,7 +8,9 @@ import {
   Delete,
   ParseUUIDPipe,
   Logger,
-  Query
+  Query,
+  HttpStatus,
+  HttpCode
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { PaginationQuery } from 'src/libs/types/pagination'
@@ -27,7 +29,7 @@ export class FlashCardController {
     @Param('deckId', ParseUUIDPipe) deckId: string,
     @Body() createFlashCardDto: CreateFlashCardDto
   ) {
-    return this.flashCardService.create({ ...createFlashCardDto, deck: deckId })
+    return this.flashCardService.create(createFlashCardDto, deckId)
   }
 
   @Get()
@@ -50,7 +52,8 @@ export class FlashCardController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('deckId', ParseUUIDPipe) deckId: string, @Param('id', ParseUUIDPipe) id: string) {
-    return this.flashCardService.remove({ deck: deckId, id })
+    this.flashCardService.remove({ deck: deckId, id })
   }
 }
