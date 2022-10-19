@@ -11,6 +11,8 @@ services:
     volumes:
       - .:/usr/src/app
     command: yarn start:dev
+    environment:
+      - DB_HOST=postgres
 
   postgres:
     image: postgres

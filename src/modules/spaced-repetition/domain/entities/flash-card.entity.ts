@@ -7,8 +7,8 @@ import {
   IsOptional,
   IsString
 } from 'class-validator'
-import { AuditedEntity } from 'src/libs/types/entity'
-import { AfterLoad, Column, Entity, ManyToOne } from 'typeorm'
+import { AuditedEntity } from '../../../../libs/types/entity'
+import { Property, Entity, ManyToOne } from '@mikro-orm/core'
 import { SchedulingStrategy } from '../value-objects/schedulers/scheduling.strategy'
 import { Deck } from './deck.entity'
 import { Review } from './review.entity'
@@ -17,36 +17,34 @@ import { Review } from './review.entity'
 export class FlashCard extends AuditedEntity {
   @IsString()
   @IsNotEmpty()
-  readonly question: string
+  question: string
 
   @IsArray()
   @ArrayNotEmpty()
-  readonly possibleAnswers: string[]
+  possibleAnswers: string[]
 
   @IsDateString()
-  @IsOptional()
-  @Column({
-    type: 'timestamp with time zone',
-    default: new Date()
+  @Property({
+    type: 'timestamp with time zone'
   })
-  dueDate: Date
-
-  isDue: boolean
-
-  @AfterLoad()
-  setIsDue() {
-    this.isDue = this.dueDate === null ? true : this.dueDate <= new Date()
-  }
+  dueDate: Date = new Date()
 
   reviews: Review[]
 
-  @ManyToOne(() => Deck, (deck) => deck.flashCards, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Deck)
   deck: Deck
 
+  @Property()
+  get isDue() {
+    return this.dueDate <= new Date()
+  }
+
+  @Property()
   get passes(): Review[] {
     return this.reviews.filter((review) => review.answeredCorrectly)
   }
 
+  @Property()
   get lapses(): Review[] {
     return this.reviews.filter((review) => !review.answeredCorrectly)
   }

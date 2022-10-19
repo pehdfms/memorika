@@ -1,33 +1,33 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { InjectRepository } from '@mikro-orm/nestjs'
 import { PaginationQuery, PaginationResponse } from 'src/libs/types/pagination'
 import { getPaginationOptions } from 'src/libs/utils/pagination.utils'
-import { Repository } from 'typeorm'
 import { CreateDeckDto } from '../../dtos/create-deck.dto'
 import { UpdateDeckDto } from '../../dtos/update-deck.dto'
 import { Deck } from '../entities/deck.entity'
+import { EntityRepository, wrap } from '@mikro-orm/core'
 
 @Injectable()
 export class DeckService {
   private readonly logger = new Logger(DeckService.name)
 
-  constructor(@InjectRepository(Deck) private readonly deckRepository: Repository<Deck>) {}
+  constructor(@InjectRepository(Deck) private readonly deckRepository: EntityRepository<Deck>) {}
 
   async create(createDeckDto: CreateDeckDto): Promise<Deck> {
-    return (await this.deckRepository.insert(createDeckDto)).generatedMaps[0] as Deck
+    const newDeck = this.deckRepository.create(createDeckDto)
+    await this.deckRepository.persistAndFlush(newDeck)
+
+    return newDeck
   }
 
   async findAll(query: PaginationQuery): Promise<PaginationResponse<Deck>> {
-    const [result, total] = await this.deckRepository.findAndCount({
-      withDeleted: false,
-      ...getPaginationOptions(query)
-    })
+    const [result, total] = await this.deckRepository.findAndCount({}, getPaginationOptions(query))
 
     return new PaginationResponse(query, total, result)
   }
 
-  async findOne(id: string) {
-    const result = await this.deckRepository.findOne({ where: { id } })
+  async findOne(id: string): Promise<Deck> {
+    const result = await this.deckRepository.findOne({ id })
 
     if (!result) {
       throw new NotFoundException()
@@ -36,28 +36,16 @@ export class DeckService {
     return result
   }
 
-  async update(id: string, updateDeckDto: UpdateDeckDto) {
-    const result = (
-      await this.deckRepository
-        .createQueryBuilder()
-        .update(updateDeckDto)
-        .where({ id })
-        .returning('*')
-        .execute()
-    ).raw[0]
+  async update(id: string, updateDeckDto: UpdateDeckDto): Promise<Deck> {
+    const existingDeck = await this.findOne(id)
+    wrap(existingDeck).assign(updateDeckDto)
 
-    if (!result) {
-      throw new NotFoundException()
-    }
-
-    return result
+    await this.deckRepository.persistAndFlush(existingDeck)
+    return existingDeck
   }
 
-  async remove(id: string) {
-    const result = await this.deckRepository.delete(id)
-
-    if (result.affected === 0) {
-      throw new NotFoundException()
-    }
+  async remove(id: string): Promise<void> {
+    const deck = await this.findOne(id)
+    await this.deckRepository.removeAndFlush(deck)
   }
 }

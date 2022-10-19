@@ -4,7 +4,7 @@ export function getPaginationOptions(query: PaginationQuery) {
   const { page, perPage } = query
 
   return {
-    take: +perPage,
-    skip: page * perPage
+    limit: +perPage,
+    offset: page * perPage
   }
 }

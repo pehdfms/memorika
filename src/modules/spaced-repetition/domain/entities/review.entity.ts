@@ -1,5 +1,5 @@
 import { OmitType } from '@nestjs/swagger'
-import { AuditedEntity } from 'src/libs/types/entity'
+import { AuditedEntity } from '../../../../libs/types/entity'
 import { FlashCard } from './flash-card.entity'
 
 export class Review extends OmitType(AuditedEntity, ['updated']) {

@@ -1,40 +1,15 @@
 import { randomUUID } from 'crypto'
-import {
-  CreateDateColumn,
-  DeleteDateColumn,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from 'typeorm'
+import { PrimaryKey, Property } from '@mikro-orm/core'
 
 export class AbstractEntity {
-  constructor() {
-    this.id = randomUUID()
-  }
-
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryKey()
+  id: string = randomUUID()
 }
 
 export class AuditedEntity extends AbstractEntity {
-  constructor() {
-    super()
+  @Property()
+  created: Date = new Date()
 
-    this.created = new Date()
-    this.updated = new Date()
-  }
-
-  @CreateDateColumn({
-    type: 'timestamp with time zone',
-    default: () => 'CURRENT_TIMESTAMP',
-    update: false
-  })
-  created: Date
-
-  @UpdateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
-  updated: Date
-}
-
-export class SoftDeleteEntity extends AbstractEntity {
-  @DeleteDateColumn({ type: 'timestamp with time zone' })
-  removed?: Date
+  @Property({ onUpdate: () => new Date() })
+  updated: Date = new Date()
 }

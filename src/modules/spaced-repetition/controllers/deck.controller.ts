@@ -22,31 +22,32 @@ import { UpdateDeckDto } from '../dtos/update-deck.dto'
 @Controller('decks')
 export class DeckController {
   private readonly logger = new Logger(DeckService.name)
+
   constructor(private readonly deckService: DeckService) {}
 
   @Post()
-  create(@Body() createDeckDto: CreateDeckDto) {
-    return this.deckService.create(createDeckDto)
+  async create(@Body() createDeckDto: CreateDeckDto) {
+    return await this.deckService.create(createDeckDto)
   }
 
   @Get()
-  findAll(@Query() query: PaginationQuery) {
-    return this.deckService.findAll(query)
+  async findAll(@Query() query: PaginationQuery) {
+    return await this.deckService.findAll(query)
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.deckService.findOne(id)
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.deckService.findOne(id)
   }
 
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateDeckDto: UpdateDeckDto) {
-    return this.deckService.update(id, updateDeckDto)
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() updateDeckDto: UpdateDeckDto) {
+    return await this.deckService.update(id, updateDeckDto)
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    this.deckService.remove(id)
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    await this.deckService.remove(id)
   }
 }

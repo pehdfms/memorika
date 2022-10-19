@@ -22,38 +22,45 @@ import { UpdateFlashCardDto } from '../dtos/update-flash-card.dto'
 @Controller('decks/:deckId/flash-cards')
 export class FlashCardController {
   private readonly logger = new Logger(FlashCardService.name)
+
   constructor(private readonly flashCardService: FlashCardService) {}
 
   @Post()
-  create(
+  async create(
     @Param('deckId', ParseUUIDPipe) deckId: string,
     @Body() createFlashCardDto: CreateFlashCardDto
   ) {
-    return this.flashCardService.create(createFlashCardDto, deckId)
+    return await this.flashCardService.create(createFlashCardDto, deckId)
   }
 
   @Get()
-  findAll(@Param('deckId', ParseUUIDPipe) deckId: string, @Query() query: PaginationQuery) {
-    return this.flashCardService.findAll({ ...query, deck: deckId })
+  async findAll(@Param('deckId', ParseUUIDPipe) deckId: string, @Query() query: PaginationQuery) {
+    return await this.flashCardService.findAll({ ...query, deck: deckId })
   }
 
   @Get(':id')
-  findOne(@Param('deckId', ParseUUIDPipe) deckId: string, @Param('id', ParseUUIDPipe) id: string) {
-    return this.flashCardService.findOne({ deck: deckId, id })
+  async findOne(
+    @Param('deckId', ParseUUIDPipe) deckId: string,
+    @Param('id', ParseUUIDPipe) id: string
+  ) {
+    return await this.flashCardService.findOne({ deck: deckId, id })
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('deckId', ParseUUIDPipe) deckId: string,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateFlashCardDto: UpdateFlashCardDto
   ) {
-    return this.flashCardService.update({ deck: deckId, id }, updateFlashCardDto)
+    return await this.flashCardService.update({ deck: deckId, id }, updateFlashCardDto)
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('deckId', ParseUUIDPipe) deckId: string, @Param('id', ParseUUIDPipe) id: string) {
-    this.flashCardService.remove({ deck: deckId, id })
+  async remove(
+    @Param('deckId', ParseUUIDPipe) deckId: string,
+    @Param('id', ParseUUIDPipe) id: string
+  ) {
+    await this.flashCardService.remove({ deck: deckId, id })
   }
 }
