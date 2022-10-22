@@ -5,8 +5,9 @@ import { SchedulingStrategy } from './scheduling.strategy'
 export class LeitnerScheduler implements SchedulingStrategy {
   private delayPerBoxInDays = 1
 
-  schedule(flashCard: FlashCard): Date {
-    return this.convertBoxToDate(this.getNextBox(flashCard.reviews))
+  async schedule(flashCard: FlashCard): Promise<Date> {
+    await flashCard.reviews.init()
+    return this.convertBoxToDate(this.getNextBox(flashCard.reviews.getItems()))
   }
 
   private convertBoxToDate(box: number): Date {
@@ -19,9 +20,6 @@ export class LeitnerScheduler implements SchedulingStrategy {
   private getNextBox(repetitions: Review[]): number {
     // Simple streak algorithm, if we miss a repetition
     // reset the streak to zero, otherwise add one.
-    return repetitions.reduce(
-      (streak, repetition) => (repetition.answeredCorrectly ? streak + 1 : 0),
-      0
-    )
+    return repetitions.reduce((streak, repetition) => (repetition.passed ? streak + 1 : 0), 0)
   }
 }

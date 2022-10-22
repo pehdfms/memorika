@@ -1,4 +1,4 @@
-import { Collection, Entity, Enum, OneToMany, Property } from '@mikro-orm/core'
+import { Cascade, Collection, Entity, Enum, OneToMany, Property } from '@mikro-orm/core'
 import { AuditedEntity } from '../../../../libs/types/entity'
 import { AvailableSchedulers } from '../value-objects/schedulers/available-schedulers.enum'
 import { FlashCard } from './flash-card.entity'
@@ -14,6 +14,10 @@ export class Deck extends AuditedEntity {
   @Enum(() => AvailableSchedulers)
   scheduler: AvailableSchedulers
 
-  @OneToMany(() => FlashCard, (flashcard) => flashcard.deck)
+  @OneToMany({
+    entity: () => FlashCard,
+    mappedBy: (flashcard) => flashcard.deck,
+    cascade: [Cascade.ALL]
+  })
   flashCards = new Collection<FlashCard>(this)
 }

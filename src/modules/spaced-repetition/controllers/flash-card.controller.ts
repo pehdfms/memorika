@@ -13,54 +13,44 @@ import {
   HttpCode
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { PaginationQuery } from 'src/libs/types/pagination'
 import { FlashCardService } from '../domain/services/flash-card.service'
 import { CreateFlashCardDto } from '../dtos/create-flash-card.dto'
+import { PaginatedFlashCardQuery } from '../dtos/paginated-flash-card-query.dto'
 import { UpdateFlashCardDto } from '../dtos/update-flash-card.dto'
 
 @ApiTags('Spaced Repetition')
-@Controller('decks/:deckId/flash-cards')
+@Controller('flash-cards')
 export class FlashCardController {
-  private readonly logger = new Logger(FlashCardService.name)
+  private readonly logger = new Logger(FlashCardController.name)
 
   constructor(private readonly flashCardService: FlashCardService) {}
 
   @Post()
-  async create(
-    @Param('deckId', ParseUUIDPipe) deckId: string,
-    @Body() createFlashCardDto: CreateFlashCardDto
-  ) {
-    return await this.flashCardService.create(createFlashCardDto, deckId)
+  async create(@Body() createFlashCardDto: CreateFlashCardDto) {
+    return await this.flashCardService.create(createFlashCardDto)
   }
 
   @Get()
-  async findAll(@Param('deckId', ParseUUIDPipe) deckId: string, @Query() query: PaginationQuery) {
-    return await this.flashCardService.findAll({ ...query, deck: deckId })
+  async findAll(@Query() query: PaginatedFlashCardQuery) {
+    return await this.flashCardService.findAll(query)
   }
 
   @Get(':id')
-  async findOne(
-    @Param('deckId', ParseUUIDPipe) deckId: string,
-    @Param('id', ParseUUIDPipe) id: string
-  ) {
-    return await this.flashCardService.findOne({ deck: deckId, id })
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.flashCardService.findOne(id)
   }
 
   @Patch(':id')
   async update(
-    @Param('deckId', ParseUUIDPipe) deckId: string,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateFlashCardDto: UpdateFlashCardDto
   ) {
-    return await this.flashCardService.update({ deck: deckId, id }, updateFlashCardDto)
+    return await this.flashCardService.update(id, updateFlashCardDto)
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(
-    @Param('deckId', ParseUUIDPipe) deckId: string,
-    @Param('id', ParseUUIDPipe) id: string
-  ) {
-    await this.flashCardService.remove({ deck: deckId, id })
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    await this.flashCardService.remove(id)
   }
 }

@@ -1,5 +1,3 @@
-import { MikroOrmModuleOptions as Options } from '@mikro-orm/nestjs'
-
 const config = {
   type: 'postgresql',
   host: process.env.DB_HOST,
@@ -15,4 +13,4 @@ const config = {
   }
 }
 
-export default config
+exports.default = config

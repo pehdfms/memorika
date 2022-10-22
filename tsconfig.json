@@ -4,6 +4,7 @@
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "target": "es2021",
@@ -16,6 +17,16 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "skipDefaultLibCheck": true,
+    "resolveJsonModule": true,
+    "importHelpers": true,
+    "rootDir": ".",
+    "paths": {
+      "@*": ["./src/*"],
+      "@libs/*": ["./src/libs/*"],
+      "@configs/*": ["./src/configs/*"],
+      "@modules/*": ["./src/modules/*"]
+    }
   }
 }

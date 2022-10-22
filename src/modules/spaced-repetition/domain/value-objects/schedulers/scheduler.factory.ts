@@ -5,11 +5,11 @@ import { SchedulingStrategy } from './scheduling.strategy'
 
 export class SchedulerFactory {
   fromEnum(scheduler: AvailableSchedulers): SchedulingStrategy {
-    switch (scheduler) {
+    switch (scheduler as AvailableSchedulers) {
       case AvailableSchedulers.LeitnerScheduler:
         return new LeitnerScheduler()
       default:
-        throw new NotImplementedException()
+        throw new NotImplementedException('Chosen Scheduler is not implemented!')
     }
   }
 }

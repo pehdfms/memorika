@@ -3,7 +3,6 @@ import { InjectRepository } from '@mikro-orm/nestjs'
 import { PaginationResponse } from 'src/libs/types/pagination'
 import { getPaginationOptions } from 'src/libs/utils/pagination.utils'
 import { CreateFlashCardDto } from '../../dtos/create-flash-card.dto'
-import { FlashCardQueryDto } from '../../dtos/flash-card-query.dto'
 import { PaginatedFlashCardQuery } from '../../dtos/paginated-flash-card-query.dto'
 import { UpdateFlashCardDto } from '../../dtos/update-flash-card.dto'
 import { FlashCard } from '../entities/flash-card.entity'
@@ -19,9 +18,9 @@ export class FlashCardService {
     private readonly deckService: DeckService
   ) {}
 
-  async create(createFlashCardDto: CreateFlashCardDto, deckId: string): Promise<FlashCard> {
-    const deck = await this.deckService.findOne(deckId)
-    const newFlashCard = this.flashCardRepository.create({ ...createFlashCardDto, deck })
+  async create(flashCard: CreateFlashCardDto): Promise<FlashCard> {
+    const deck = await this.deckService.findOne(flashCard.deck)
+    const newFlashCard = this.flashCardRepository.create({ ...flashCard, deck })
 
     await this.flashCardRepository.persistAndFlush(newFlashCard)
 
@@ -29,26 +28,17 @@ export class FlashCardService {
   }
 
   async findAll(query: PaginatedFlashCardQuery): Promise<PaginationResponse<FlashCard>> {
-    const { deck } = query
-
     const [result, total] = await this.flashCardRepository.findAndCount(
-      {
-        deck: {
-          id: deck
-        }
-      },
+      {},
       getPaginationOptions(query)
     )
 
     return new PaginationResponse(query, total, result)
   }
 
-  async findOne({ deck, id }: FlashCardQueryDto): Promise<FlashCard> {
+  async findOne(id: string): Promise<FlashCard> {
     const result = await this.flashCardRepository.findOne({
-      id,
-      deck: {
-        id: deck
-      }
+      id
     })
 
     if (!result) {
@@ -58,19 +48,16 @@ export class FlashCardService {
     return result
   }
 
-  async update(
-    query: FlashCardQueryDto,
-    updateFlashCardDto: UpdateFlashCardDto
-  ): Promise<FlashCard> {
-    const existingFlashCard = await this.findOne(query)
-    wrap(existingFlashCard).assign(updateFlashCardDto)
+  async update(id: string, updatedFlashCard: UpdateFlashCardDto): Promise<FlashCard> {
+    const existingFlashCard = await this.findOne(id)
+    wrap(existingFlashCard).assign(updatedFlashCard)
 
     await this.flashCardRepository.persistAndFlush(existingFlashCard)
     return existingFlashCard
   }
 
-  async remove(query: FlashCardQueryDto): Promise<void> {
-    const flashCard = await this.findOne(query)
+  async remove(id: string): Promise<void> {
+    const flashCard = await this.findOne(id)
     await this.flashCardRepository.removeAndFlush(flashCard)
   }
 }

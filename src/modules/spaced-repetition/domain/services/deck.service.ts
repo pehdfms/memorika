@@ -27,7 +27,7 @@ export class DeckService {
   }
 
   async findOne(id: string): Promise<Deck> {
-    const result = await this.deckRepository.findOne({ id })
+    const result = await this.deckRepository.findOne({ id }, { populate: ['flashCards'] })
 
     if (!result) {
       throw new NotFoundException()

@@ -1,14 +1,7 @@
 import { BadRequestException } from '@nestjs/common'
-import {
-  ArrayNotEmpty,
-  IsArray,
-  IsDateString,
-  IsNotEmpty,
-  IsOptional,
-  IsString
-} from 'class-validator'
+import { ArrayNotEmpty, IsArray, IsDateString, IsNotEmpty, IsString } from 'class-validator'
 import { AuditedEntity } from '../../../../libs/types/entity'
-import { Property, Entity, ManyToOne } from '@mikro-orm/core'
+import { Property, Entity, ManyToOne, Collection, OneToMany, Cascade } from '@mikro-orm/core'
 import { SchedulingStrategy } from '../value-objects/schedulers/scheduling.strategy'
 import { Deck } from './deck.entity'
 import { Review } from './review.entity'
@@ -17,50 +10,58 @@ import { Review } from './review.entity'
 export class FlashCard extends AuditedEntity {
   @IsString()
   @IsNotEmpty()
+  @Property()
   question: string
 
   @IsArray()
   @ArrayNotEmpty()
+  @Property()
   possibleAnswers: string[]
 
   @IsDateString()
   @Property({
     type: 'timestamp with time zone'
   })
-  dueDate: Date = new Date()
+  // -1 second to avoid a race condition that only happens in e2e tests
+  // If we don't have this e2e tests are indeterministic, as sometimes
+  // the due date starts off a couple miliseconds AFTER the current date
+  // FIXME: I have no idea why this happens, mikro-orm batching?
+  dueDate: Date = new Date(Date.now() - 1000)
 
-  reviews: Review[]
+  @OneToMany({
+    entity: () => Review,
+    mappedBy: (review) => review.reviewedCard,
+    cascade: [Cascade.ALL]
+  })
+  reviews = new Collection<Review>(this)
 
   @ManyToOne(() => Deck)
   deck: Deck
 
-  @Property()
+  @Property({ persist: false })
   get isDue() {
-    return this.dueDate <= new Date()
-  }
-
-  @Property()
-  get passes(): Review[] {
-    return this.reviews.filter((review) => review.answeredCorrectly)
-  }
-
-  @Property()
-  get lapses(): Review[] {
-    return this.reviews.filter((review) => !review.answeredCorrectly)
+    return new Date() >= this.dueDate
   }
 
   isAnswerCorrect(answer: string): boolean {
     return this.possibleAnswers.includes(answer)
   }
 
-  submitAnswer(answer: string, scheduler: SchedulingStrategy) {
+  async submitAnswer(answer: string, scheduler: SchedulingStrategy): Promise<Review> {
     if (!this.isDue) {
+      console.log('is this the error?')
       throw new BadRequestException(
         'Submitting answers for flash cards that are not due is not allowed!'
       )
     }
 
-    this.reviews.push(new Review(this, answer))
-    this.dueDate = scheduler.schedule(this)
+    await this.reviews.init()
+
+    const newReview = new Review(this, answer, this.isAnswerCorrect(answer))
+
+    this.reviews.add(newReview)
+    this.dueDate = await scheduler.schedule(this)
+
+    return newReview
   }
 }

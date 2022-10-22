@@ -113,6 +113,24 @@
           "length": 6,
           "mappedType": "datetime"
         },
+        "question": {
+          "name": "question",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "possible_answers": {
+          "name": "possible_answers",
+          "type": "text[]",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "array"
+        },
         "due_date": {
           "name": "due_date",
           "type": "timestamptz(0)",
@@ -131,33 +149,6 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
-        },
-        "is_due": {
-          "name": "is_due",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
-        },
-        "passes": {
-          "name": "passes",
-          "type": "text[]",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "array"
-        },
-        "lapses": {
-          "name": "lapses",
-          "type": "text[]",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "array"
         }
       },
       "name": "flash_card",
@@ -185,6 +176,84 @@
             "id"
           ],
           "referencedTableName": "public.deck",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamptz(0)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "reviewed_card_id": {
+          "name": "reviewed_card_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "answer": {
+          "name": "answer",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "passed": {
+          "name": "passed",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "boolean"
+        }
+      },
+      "name": "review",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "review_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "review_reviewed_card_id_foreign": {
+          "constraintName": "review_reviewed_card_id_foreign",
+          "columnNames": [
+            "reviewed_card_id"
+          ],
+          "localTableName": "public.review",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.flash_card",
           "updateRule": "cascade"
         }
       }

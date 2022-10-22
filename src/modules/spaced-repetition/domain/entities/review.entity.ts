@@ -1,17 +1,26 @@
-import { OmitType } from '@nestjs/swagger'
-import { AuditedEntity } from '../../../../libs/types/entity'
+import { Entity, ManyToOne, Property } from '@mikro-orm/core'
+import { AbstractEntity } from '../../../../libs/types/entity'
 import { FlashCard } from './flash-card.entity'
 
-export class Review extends OmitType(AuditedEntity, ['updated']) {
-  constructor(card: FlashCard, answer: string) {
+@Entity()
+export class Review extends AbstractEntity {
+  constructor(card: FlashCard, answer: string, passed: boolean) {
     super()
 
     this.reviewedCard = card
     this.answer = answer
-    this.answeredCorrectly = card.isAnswerCorrect(answer)
+    this.passed = passed
   }
 
+  @Property()
+  created: Date = new Date()
+
+  @ManyToOne(() => FlashCard)
   reviewedCard: FlashCard
+
+  @Property()
   answer: string
-  answeredCorrectly: boolean
+
+  @Property()
+  passed: boolean
 }

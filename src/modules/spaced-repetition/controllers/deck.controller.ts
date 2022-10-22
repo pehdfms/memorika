@@ -1,3 +1,4 @@
+import { PaginationQuery } from '@libs/types/pagination'
 import {
   Controller,
   Get,
@@ -13,7 +14,6 @@ import {
   HttpStatus
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { PaginationQuery } from 'src/libs/types/pagination'
 import { DeckService } from '../domain/services/deck.service'
 import { CreateDeckDto } from '../dtos/create-deck.dto'
 import { UpdateDeckDto } from '../dtos/update-deck.dto'
@@ -21,7 +21,7 @@ import { UpdateDeckDto } from '../dtos/update-deck.dto'
 @ApiTags('Spaced Repetition')
 @Controller('decks')
 export class DeckController {
-  private readonly logger = new Logger(DeckService.name)
+  private readonly logger = new Logger(DeckController.name)
 
   constructor(private readonly deckService: DeckService) {}
 

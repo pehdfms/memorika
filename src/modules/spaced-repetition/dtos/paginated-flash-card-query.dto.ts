@@ -1,8 +1,8 @@
-import { IsDefined, IsUUID } from 'class-validator'
-import { PaginationQuery } from 'src/libs/types/pagination'
+import { PaginationQuery } from '@libs/types/pagination'
+import { IsOptional, IsUUID } from 'class-validator'
 
 export class PaginatedFlashCardQuery extends PaginationQuery {
-  @IsDefined()
+  @IsOptional()
   @IsUUID()
-  deck: string
+  deck?: string
 }
