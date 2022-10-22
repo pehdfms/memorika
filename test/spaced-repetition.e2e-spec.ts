@@ -41,7 +41,6 @@ describe('Spaced Repetition Module (e2e)', () => {
   })
 
   describe('Happy Path', () => {
-    // FIXME: Supertest seems to be leaving open handles...
     let deckResponse: any
     let flashCardResponse: any
     let reviewResponse: any
