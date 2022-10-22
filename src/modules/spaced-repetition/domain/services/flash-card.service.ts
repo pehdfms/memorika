@@ -58,6 +58,8 @@ export class FlashCardService {
 
   async remove(id: string): Promise<void> {
     const flashCard = await this.findOne(id)
+    await this.flashCardRepository.populate(flashCard, ['reviews'])
+
     await this.flashCardRepository.removeAndFlush(flashCard)
   }
 }

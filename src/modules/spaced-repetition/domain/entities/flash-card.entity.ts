@@ -1,5 +1,12 @@
 import { BadRequestException } from '@nestjs/common'
-import { ArrayNotEmpty, IsArray, IsDateString, IsNotEmpty, IsString } from 'class-validator'
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsNotEmpty,
+  IsString
+} from 'class-validator'
 import { AuditedEntity } from '../../../../libs/types/entity'
 import { Property, Entity, ManyToOne, Collection, OneToMany, Cascade } from '@mikro-orm/core'
 import { SchedulingStrategy } from '../value-objects/schedulers/scheduling.strategy'
@@ -8,17 +15,15 @@ import { Review } from './review.entity'
 
 @Entity()
 export class FlashCard extends AuditedEntity {
-  @IsString()
-  @IsNotEmpty()
   @Property()
   question: string
 
-  @IsArray()
-  @ArrayNotEmpty()
   @Property()
   possibleAnswers: string[]
 
-  @IsDateString()
+  @Property()
+  caseSensitive: boolean
+
   @Property({
     type: 'timestamp with time zone'
   })
@@ -44,12 +49,15 @@ export class FlashCard extends AuditedEntity {
   }
 
   isAnswerCorrect(answer: string): boolean {
-    return this.possibleAnswers.includes(answer)
+    return this.possibleAnswers.some((possibleAnswer) =>
+      this.caseSensitive
+        ? possibleAnswer === answer
+        : possibleAnswer.toLowerCase() === answer.toLowerCase()
+    )
   }
 
   async submitAnswer(answer: string, scheduler: SchedulingStrategy): Promise<Review> {
     if (!this.isDue) {
-      console.log('is this the error?')
       throw new BadRequestException(
         'Submitting answers for flash cards that are not due is not allowed!'
       )

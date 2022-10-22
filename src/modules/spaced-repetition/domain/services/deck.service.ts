@@ -46,6 +46,8 @@ export class DeckService {
 
   async remove(id: string): Promise<void> {
     const deck = await this.findOne(id)
+    await this.deckRepository.populate(deck, ['flashCards.reviews'])
+
     await this.deckRepository.removeAndFlush(deck)
   }
 }

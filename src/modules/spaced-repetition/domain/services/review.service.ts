@@ -26,10 +26,9 @@ export class ReviewService {
     const scheduler = new SchedulerFactory().fromEnum(flashCard.deck.scheduler)
     const addedReview = await flashCard.submitAnswer(review.answer, scheduler)
 
-    console.log('submitted answer')
-
     await this.flashCardRepository.persistAndFlush(flashCard)
     await this.reviewRepository.persistAndFlush(addedReview)
+
     return addedReview
   }
 

@@ -131,6 +131,15 @@
           "nullable": false,
           "mappedType": "array"
         },
+        "case_sensitive": {
+          "name": "case_sensitive",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "boolean"
+        },
         "due_date": {
           "name": "due_date",
           "type": "timestamptz(0)",
