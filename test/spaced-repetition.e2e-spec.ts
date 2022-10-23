@@ -17,7 +17,7 @@ describe('Spaced Repetition Module (e2e)', () => {
         .expect(status)
     ).body
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [SpacedRepetitionModule, MikroOrmModule.forRoot()]
     }).compile()
@@ -42,7 +42,7 @@ describe('Spaced Repetition Module (e2e)', () => {
     server = app.getHttpServer()
   })
 
-  afterAll(async () => {
+  afterEach(async () => {
     await app.close()
     server.close()
   })
@@ -129,6 +129,48 @@ describe('Spaced Repetition Module (e2e)', () => {
 
       it('should delete the review automatically', async () => {
         await visit('reviews/' + reviewResponse.id, HttpStatus.NOT_FOUND)
+      })
+    })
+  })
+
+  describe('Sad Path', () => {
+    describe('Deck Creation', () => {
+      describe('Bad Names', () => {
+        const invalidPost = async (name: string) =>
+          await request(server)
+            .post('/api/decks')
+            .send({
+              name,
+              description: 'Deck used in e2e testing',
+              scheduler: 'LeitnerScheduler'
+            })
+            .expect(HttpStatus.BAD_REQUEST)
+
+        it('should not allow empty name', async () => await invalidPost(''))
+        it('should not allow blank name', async () => await invalidPost('   '))
+
+        const checkTrimPost = async (name: string) => {
+          const response = (
+            await request(server)
+              .post('/api/decks')
+              .send({
+                name,
+                description: 'Deck used in e2e testing',
+                scheduler: 'LeitnerScheduler'
+              })
+              .expect(HttpStatus.CREATED)
+          ).body
+
+          expect(response.name).toBe(name.trim())
+
+          await request(server)
+            .delete('/api/decks/' + response.id)
+            .expect(HttpStatus.NO_CONTENT)
+        }
+
+        it('should trim name with right padding', async () => await checkTrimPost('wrong  '))
+        it('should trim name with both paddings', async () => await checkTrimPost(' wrong '))
+        it('should trim name with left padding', async () => await checkTrimPost('   wrong'))
       })
     })
   })
