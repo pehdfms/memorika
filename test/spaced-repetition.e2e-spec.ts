@@ -66,7 +66,8 @@ describe('Spaced Repetition Module (e2e)', () => {
           .send({
             deck: deckResponse.id,
             question: 'Should this test pass?',
-            possibleAnswers: ['yes']
+            possibleAnswers: ['yes'],
+            caseSensitive: false
           })
           .expect(HttpStatus.CREATED)
       ).body

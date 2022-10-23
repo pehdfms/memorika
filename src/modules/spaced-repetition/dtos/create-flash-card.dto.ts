@@ -1,13 +1,5 @@
-import { ApiPropertyOptional } from '@nestjs/swagger'
-import {
-  ArrayNotEmpty,
-  IsArray,
-  IsBoolean,
-  IsDefined,
-  IsOptional,
-  IsString,
-  IsUUID
-} from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
+import { ArrayNotEmpty, IsArray, IsBoolean, IsDefined, IsString, IsUUID } from 'class-validator'
 
 export class CreateFlashCardDto {
   @IsDefined()
@@ -24,8 +16,8 @@ export class CreateFlashCardDto {
   @ArrayNotEmpty()
   possibleAnswers: string[]
 
-  @ApiPropertyOptional({ default: false })
-  @IsOptional()
+  @ApiProperty({ default: false })
+  @IsDefined()
   @IsBoolean()
-  caseSensitive: boolean = false
+  caseSensitive: boolean
 }

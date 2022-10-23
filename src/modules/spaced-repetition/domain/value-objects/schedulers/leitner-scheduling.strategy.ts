@@ -32,12 +32,14 @@ export class LeitnerScheduler implements SchedulingStrategy {
       )
     }
 
-    return this.convertBoxToDate(this.getNextBox(flashCard.reviews.getItems()), lastReviewDate)
+    return resultingDate
   }
 
   private convertBoxToDate(box: number, startingDate: Date): Date {
+    // We receive a startingDate by argument so that we can schedule by actual
+    // completion date, even if the scheduling gets delayed. Worst case this
+    // can lead to schedules for the past, but that's a valid state to have.
     const resultingDate = new Date(startingDate.getTime() + box * this.getDelayPerBox())
-
     return resultingDate
   }
 
