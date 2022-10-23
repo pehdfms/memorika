@@ -19,7 +19,7 @@ export class LeitnerScheduler implements SchedulingStrategy {
     }
 
     const lastReviewDate = flashCard.reviews[flashCard.reviews.length - 1].reviewDate
-    const resultingDate = this.convertBoxToDate(
+    let resultingDate = this.convertBoxToDate(
       this.getNextBox(flashCard.reviews.getItems()),
       lastReviewDate
     )
@@ -30,6 +30,9 @@ export class LeitnerScheduler implements SchedulingStrategy {
           'The program can cope with this, but it suggests a bad scheduler ' +
           'implementation.'
       )
+
+      // Limit the effect that bad schedules have on a card.
+      resultingDate = lastReviewDate
     }
 
     return resultingDate

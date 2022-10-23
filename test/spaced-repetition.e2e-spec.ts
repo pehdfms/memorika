@@ -10,6 +10,13 @@ describe('Spaced Repetition Module (e2e)', () => {
   let app: INestApplication
   let server: any
 
+  const visit = async (endpoint: string, status: HttpStatus = HttpStatus.OK): Promise<any> =>
+    (
+      await request(server)
+        .get('/api/' + endpoint)
+        .expect(status)
+    ).body
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [SpacedRepetitionModule, MikroOrmModule.forRoot()]
@@ -59,72 +66,70 @@ describe('Spaced Repetition Module (e2e)', () => {
       ).body
     })
 
-    it('should create a flash card that is immediately due', async () => {
-      flashCardResponse = (
-        await request(server)
-          .post('/api/flash-cards')
-          .send({
-            deck: deckResponse.id,
-            question: 'Should this test pass?',
-            possibleAnswers: ['yes'],
-            caseSensitive: false
-          })
-          .expect(HttpStatus.CREATED)
-      ).body
+    describe('Flash Card Creation', () => {
+      it('should create a flash card', async () => {
+        flashCardResponse = (
+          await request(server)
+            .post('/api/flash-cards')
+            .send({
+              deck: deckResponse.id,
+              question: 'Should this test pass?',
+              possibleAnswers: ['yes'],
+              caseSensitive: false
+            })
+            .expect(HttpStatus.CREATED)
+        ).body
+      })
 
-      // Newly created Flash Cards should immediately be due
-      expect(flashCardResponse.isDue).toBe(true)
+      it('should be due immediately', () => expect(flashCardResponse.isDue).toBe(true))
     })
 
-    it('should correctly review a flash card, updating its due date', async () => {
-      // Since we didn't specify case sensitivity, it should accept Yes
-      // with "incorrect" casing
-      reviewResponse = (
-        await request(server)
-          .post('/api/reviews')
-          .send({ flashCard: flashCardResponse.id, answer: 'Yes' })
-          .expect(HttpStatus.CREATED)
-      ).body
+    describe('Correct Flash Card Review', () => {
+      it('should create a review', async () => {
+        // Since we didn't specify case sensitivity, it should accept Yes
+        // with "incorrect" casing
+        reviewResponse = (
+          await request(server)
+            .post('/api/reviews')
+            .send({ flashCard: flashCardResponse.id, answer: 'Yes' })
+            .expect(HttpStatus.CREATED)
+        ).body
+      })
 
-      // Review should count as passed
-      expect(reviewResponse.passed).toBe(true)
+      it('should count as passed', () => expect(reviewResponse.passed).toBe(true))
 
-      // The Flash Card we created should now have an updated due date
-      newFlashCardResponse = (
-        await request(server)
-          .get('/api/flash-cards/' + flashCardResponse.id)
-          .expect(HttpStatus.OK)
-      ).body
+      describe('Flash Card Updates after Review', () => {
+        it('should GET the created flash card', async () => {
+          newFlashCardResponse = await visit('flash-cards/' + flashCardResponse.id)
+        })
 
-      // So it shouldn't be due anymore
-      expect(newFlashCardResponse.isDue).toBe(false)
+        it('should not be due anymore', () => expect(newFlashCardResponse.isDue).toBe(false))
 
-      // And the new due date should be after the original due date
-      expect(new Date(newFlashCardResponse.dueDate) > new Date(flashCardResponse.dueDate)).toBe(
-        true
-      )
+        it('should update the due date to be after the original', () =>
+          expect(new Date(newFlashCardResponse.dueDate) > new Date(flashCardResponse.dueDate)).toBe(
+            true
+          ))
+      })
     })
 
-    it('should delete all relations when deleting a deck', async () => {
-      // Clean database if all goes well
-      await request(server)
-        .delete('/api/decks/' + deckResponse.id)
-        .expect(HttpStatus.NO_CONTENT)
+    describe('Cascade Cleanup', () => {
+      it('should allow deck deletion', async () => {
+        await request(server)
+          .delete('/api/decks/' + deckResponse.id)
+          .expect(HttpStatus.NO_CONTENT)
+      })
 
-      // Expect Deck to be deleted
-      await request(server)
-        .get('/api/decks/' + deckResponse.id)
-        .expect(HttpStatus.NOT_FOUND)
+      it('should delete the deck', async () => {
+        await visit('decks/' + deckResponse.id, HttpStatus.NOT_FOUND)
+      })
 
-      // Expect Flash Card to be deleted
-      await request(server)
-        .get('/api/flash-cards/' + flashCardResponse.id)
-        .expect(HttpStatus.NOT_FOUND)
+      it('should delete the flash card automatically', async () => {
+        await visit('flash-cards/' + flashCardResponse.id, HttpStatus.NOT_FOUND)
+      })
 
-      // Expect Review to be deleted
-      await request(server)
-        .get('/api/reviews/' + reviewResponse.id)
-        .expect(HttpStatus.NOT_FOUND)
+      it('should delete the review automatically', async () => {
+        await visit('reviews/' + reviewResponse.id, HttpStatus.NOT_FOUND)
+      })
     })
   })
 })
