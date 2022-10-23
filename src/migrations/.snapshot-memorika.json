@@ -200,8 +200,8 @@
           "nullable": false,
           "mappedType": "string"
         },
-        "created": {
-          "name": "created",
+        "review_date": {
+          "name": "review_date",
           "type": "timestamptz(0)",
           "unsigned": false,
           "autoincrement": false,

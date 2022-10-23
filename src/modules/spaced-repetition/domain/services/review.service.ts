@@ -2,11 +2,10 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@mikro-orm/nestjs'
 import { PaginationQuery, PaginationResponse } from 'src/libs/types/pagination'
 import { getPaginationOptions } from 'src/libs/utils/pagination.utils'
-import { EntityRepository, wrap } from '@mikro-orm/core'
+import { EntityRepository } from '@mikro-orm/core'
 import { CreateReviewDto } from '@modules/spaced-repetition/dtos/create-review.dto'
 import { Review } from '../entities/review.entity'
 import { FlashCardService } from './flash-card.service'
-import { SchedulerFactory } from '../value-objects/schedulers/scheduler.factory'
 import { FlashCard } from '../entities/flash-card.entity'
 
 @Injectable()
@@ -21,13 +20,11 @@ export class ReviewService {
 
   async create(review: CreateReviewDto) {
     const flashCard = await this.flashCardService.findOne(review.flashCard)
-    await wrap(flashCard.deck).init()
+    await this.flashCardRepository.populate(flashCard, ['deck', 'reviews'])
 
-    const scheduler = new SchedulerFactory().fromEnum(flashCard.deck.scheduler)
-    const addedReview = await flashCard.submitAnswer(review.answer, scheduler)
+    const addedReview = await flashCard.submitAnswer(review.answer)
 
     await this.flashCardRepository.persistAndFlush(flashCard)
-    await this.reviewRepository.persistAndFlush(addedReview)
 
     return addedReview
   }

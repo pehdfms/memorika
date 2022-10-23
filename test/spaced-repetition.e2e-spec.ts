@@ -104,7 +104,7 @@ describe('Spaced Repetition Module (e2e)', () => {
       )
     })
 
-    it('should correctly delete all relations when deleting a deck', async () => {
+    it('should delete all relations when deleting a deck', async () => {
       // Clean database if all goes well
       await request(server)
         .delete('/api/decks/' + deckResponse.id)
