@@ -1,8 +1,8 @@
 import { PaginationQuery } from '@libs/types/pagination'
 import { Controller, Get, Post, Body, Param, ParseUUIDPipe, Logger, Query } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { ReviewService } from '../domain/services/review.service'
-import { CreateReviewDto } from '../dtos/create-review.dto'
+import { ReviewService } from '../reviews/review.service'
+import { CreateReviewDto } from './dtos/create-review.dto'
 
 @ApiTags('Spaced Repetition')
 @Controller('reviews')

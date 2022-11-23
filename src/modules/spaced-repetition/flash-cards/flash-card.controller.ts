@@ -13,10 +13,10 @@ import {
   HttpCode
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { FlashCardService } from '../domain/services/flash-card.service'
-import { CreateFlashCardDto } from '../dtos/create-flash-card.dto'
-import { PaginatedFlashCardQuery } from '../dtos/paginated-flash-card-query.dto'
-import { UpdateFlashCardDto } from '../dtos/update-flash-card.dto'
+import { FlashCardService } from '../flash-cards/flash-card.service'
+import { CreateFlashCardDto } from './dtos/create-flash-card.dto'
+import { PaginatedFlashCardQuery } from './dtos/paginated-flash-card-query.dto'
+import { UpdateFlashCardDto } from './dtos/update-flash-card.dto'
 
 @ApiTags('Spaced Repetition')
 @Controller('flash-cards')

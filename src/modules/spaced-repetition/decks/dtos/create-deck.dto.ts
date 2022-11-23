@@ -1,6 +1,6 @@
+import { AvailableSchedulers } from '@modules/spaced-repetition/schedulers/scheduler.factory'
 import { Transform, TransformFnParams } from 'class-transformer'
 import { IsDefined, IsEnum, IsNotEmpty, IsString } from 'class-validator'
-import { AvailableSchedulers } from '../domain/value-objects/schedulers/available-schedulers.enum'
 
 export class CreateDeckDto {
   @IsDefined()

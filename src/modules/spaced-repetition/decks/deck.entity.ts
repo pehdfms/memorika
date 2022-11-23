@@ -1,9 +1,8 @@
+import { AuditedEntity } from '@libs/types/entity'
 import { Cascade, Collection, Entity, Enum, OneToMany, Property } from '@mikro-orm/core'
-import { AuditedEntity } from '../../../../libs/types/entity'
-import { AvailableSchedulers } from '../value-objects/schedulers/available-schedulers.enum'
-import { SchedulerFactory } from '../value-objects/schedulers/scheduler.factory'
-import { SchedulingStrategy } from '../value-objects/schedulers/scheduling.strategy'
-import { FlashCard } from './flash-card.entity'
+import { FlashCard } from '../flash-cards/flash-card.entity'
+import { AvailableSchedulers, SchedulerFactory } from '../schedulers/scheduler.factory'
+import { SchedulingStrategy } from '../schedulers/scheduling.strategy'
 
 @Entity()
 export class Deck extends AuditedEntity {

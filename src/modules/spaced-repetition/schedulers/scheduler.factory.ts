@@ -1,7 +1,10 @@
 import { NotImplementedException } from '@nestjs/common'
-import { AvailableSchedulers } from './available-schedulers.enum'
 import { LeitnerScheduler } from './leitner-scheduling.strategy'
 import { SchedulingStrategy } from './scheduling.strategy'
+
+export enum AvailableSchedulers {
+  LeitnerScheduler = 'LeitnerScheduler'
+}
 
 export class SchedulerFactory {
   fromEnum(scheduler: AvailableSchedulers): SchedulingStrategy {

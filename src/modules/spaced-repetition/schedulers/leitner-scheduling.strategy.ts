@@ -1,7 +1,7 @@
 import { oneDay } from '@libs/utils/time.utils'
 import { InternalServerErrorException, Logger } from '@nestjs/common'
-import { FlashCard } from '../../entities/flash-card.entity'
-import { Review } from '../../entities/review.entity'
+import { FlashCard } from '../flash-cards/flash-card.entity'
+import { Review } from '../reviews/review.entity'
 import { SchedulingStrategy } from './scheduling.strategy'
 
 export class LeitnerScheduler implements SchedulingStrategy {

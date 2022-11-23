@@ -14,9 +14,9 @@ import {
   HttpStatus
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { DeckService } from '../domain/services/deck.service'
-import { CreateDeckDto } from '../dtos/create-deck.dto'
-import { UpdateDeckDto } from '../dtos/update-deck.dto'
+import { DeckService } from '../decks/deck.service'
+import { CreateDeckDto } from './dtos/create-deck.dto'
+import { UpdateDeckDto } from './dtos/update-deck.dto'
 
 @ApiTags('Spaced Repetition')
 @Controller('decks')

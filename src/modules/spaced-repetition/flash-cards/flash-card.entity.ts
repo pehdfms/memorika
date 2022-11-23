@@ -7,10 +7,10 @@ import {
   IsNotEmpty,
   IsString
 } from 'class-validator'
-import { AuditedEntity } from '../../../../libs/types/entity'
 import { Property, Entity, ManyToOne, Collection, OneToMany, Cascade } from '@mikro-orm/core'
-import { Deck } from './deck.entity'
-import { Review } from './review.entity'
+import { AuditedEntity } from '@libs/types/entity'
+import { Review } from '../reviews/review.entity'
+import { Deck } from '../decks/deck.entity'
 
 @Entity()
 export class FlashCard extends AuditedEntity {

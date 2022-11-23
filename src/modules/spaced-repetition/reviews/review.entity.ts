@@ -1,6 +1,6 @@
+import { AbstractEntity } from '@libs/types/entity'
 import { Entity, ManyToOne, Property } from '@mikro-orm/core'
-import { AbstractEntity } from '../../../../libs/types/entity'
-import { FlashCard } from './flash-card.entity'
+import { FlashCard } from '../flash-cards/flash-card.entity'
 
 @Entity()
 export class Review extends AbstractEntity {

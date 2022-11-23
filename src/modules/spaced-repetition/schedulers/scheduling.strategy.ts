@@ -1,4 +1,4 @@
-import { FlashCard } from '../../entities/flash-card.entity'
+import { FlashCard } from '../flash-cards/flash-card.entity'
 
 export interface SchedulingStrategy {
   schedule(flashCard: FlashCard): Promise<Date>

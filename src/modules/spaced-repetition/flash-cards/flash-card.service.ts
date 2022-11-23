@@ -2,12 +2,12 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@mikro-orm/nestjs'
 import { PaginationResponse } from 'src/libs/types/pagination'
 import { getPaginationOptions } from 'src/libs/utils/pagination.utils'
-import { CreateFlashCardDto } from '../../dtos/create-flash-card.dto'
-import { PaginatedFlashCardQuery } from '../../dtos/paginated-flash-card-query.dto'
-import { UpdateFlashCardDto } from '../../dtos/update-flash-card.dto'
-import { FlashCard } from '../entities/flash-card.entity'
-import { DeckService } from './deck.service'
 import { EntityRepository, wrap } from '@mikro-orm/core'
+import { FlashCard } from './flash-card.entity'
+import { DeckService } from '../decks/deck.service'
+import { PaginatedFlashCardQuery } from './dtos/paginated-flash-card-query.dto'
+import { CreateFlashCardDto } from './dtos/create-flash-card.dto'
+import { UpdateFlashCardDto } from './dtos/update-flash-card.dto'
 
 @Injectable()
 export class FlashCardService {

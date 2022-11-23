@@ -1,11 +1,11 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common'
+import { EntityRepository, wrap } from '@mikro-orm/core'
 import { InjectRepository } from '@mikro-orm/nestjs'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { PaginationQuery, PaginationResponse } from 'src/libs/types/pagination'
 import { getPaginationOptions } from 'src/libs/utils/pagination.utils'
-import { CreateDeckDto } from '../../dtos/create-deck.dto'
-import { UpdateDeckDto } from '../../dtos/update-deck.dto'
-import { Deck } from '../entities/deck.entity'
-import { EntityRepository, wrap } from '@mikro-orm/core'
+import { Deck } from './deck.entity'
+import { CreateDeckDto } from './dtos/create-deck.dto'
+import { UpdateDeckDto } from './dtos/update-deck.dto'
 
 @Injectable()
 export class DeckService {

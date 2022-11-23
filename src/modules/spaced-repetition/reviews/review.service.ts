@@ -3,10 +3,10 @@ import { InjectRepository } from '@mikro-orm/nestjs'
 import { PaginationQuery, PaginationResponse } from 'src/libs/types/pagination'
 import { getPaginationOptions } from 'src/libs/utils/pagination.utils'
 import { EntityRepository } from '@mikro-orm/core'
-import { CreateReviewDto } from '@modules/spaced-repetition/dtos/create-review.dto'
-import { Review } from '../entities/review.entity'
-import { FlashCardService } from './flash-card.service'
-import { FlashCard } from '../entities/flash-card.entity'
+import { CreateReviewDto } from '@modules/spaced-repetition/reviews/dtos/create-review.dto'
+import { Review } from './review.entity'
+import { FlashCard } from '../flash-cards/flash-card.entity'
+import { FlashCardService } from '../flash-cards/flash-card.service'
 
 @Injectable()
 export class ReviewService {
