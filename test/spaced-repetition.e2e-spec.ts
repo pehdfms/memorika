@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
-import request from 'supertest'
+import request, { SuperAgentTest } from 'supertest'
 import { SpacedRepetitionModule } from '@modules/spaced-repetition/spaced-repetition.module'
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { HttpAdapterHost } from '@nestjs/core'
@@ -8,14 +8,11 @@ import { QueryErrorFilter } from '@configs/filters/query-error.filter'
 
 describe('Spaced Repetition Module (e2e)', () => {
   let app: INestApplication
+  let agent: SuperAgentTest
   let server: any
 
   const visit = async (endpoint: string, status: HttpStatus = HttpStatus.OK): Promise<any> =>
-    (
-      await request(server)
-        .get('/api/' + endpoint)
-        .expect(status)
-    ).body
+    (await agent.get('/api/' + endpoint).expect(status)).body
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -40,6 +37,7 @@ describe('Spaced Repetition Module (e2e)', () => {
     await app.init()
 
     server = app.getHttpServer()
+    agent = request.agent(server)
   })
 
   afterEach(async () => {
@@ -55,7 +53,7 @@ describe('Spaced Repetition Module (e2e)', () => {
 
     it('should create a deck', async () => {
       deckResponse = (
-        await request(server)
+        await agent
           .post('/api/decks')
           .send({
             name: 'Test',
@@ -69,7 +67,7 @@ describe('Spaced Repetition Module (e2e)', () => {
     describe('Flash Card Creation', () => {
       it('should create a flash card', async () => {
         flashCardResponse = (
-          await request(server)
+          await agent
             .post('/api/flash-cards')
             .send({
               deck: deckResponse.id,
@@ -89,7 +87,7 @@ describe('Spaced Repetition Module (e2e)', () => {
         // Since we didn't specify case sensitivity, it should accept Yes
         // with "incorrect" casing
         reviewResponse = (
-          await request(server)
+          await agent
             .post('/api/reviews')
             .send({ flashCard: flashCardResponse.id, answer: 'Yes' })
             .expect(HttpStatus.CREATED)
@@ -114,9 +112,7 @@ describe('Spaced Repetition Module (e2e)', () => {
 
     describe('Cascade Cleanup', () => {
       it('should allow deck deletion', async () => {
-        await request(server)
-          .delete('/api/decks/' + deckResponse.id)
-          .expect(HttpStatus.NO_CONTENT)
+        await agent.delete('/api/decks/' + deckResponse.id).expect(HttpStatus.NO_CONTENT)
       })
 
       it('should delete the deck', async () => {
@@ -136,36 +132,27 @@ describe('Spaced Repetition Module (e2e)', () => {
   describe('Sad Path', () => {
     describe('Deck Creation', () => {
       describe('Bad Names', () => {
-        const invalidPost = async (name: string) =>
-          await request(server)
+        const checkPost = async (name: string, expected: HttpStatus) =>
+          await agent
             .post('/api/decks')
             .send({
               name,
               description: 'Deck used in e2e testing',
               scheduler: 'LeitnerScheduler'
             })
-            .expect(HttpStatus.BAD_REQUEST)
+            .expect(expected)
+
+        const invalidPost = async (name: string) => checkPost(name, HttpStatus.BAD_REQUEST)
 
         it('should not allow empty name', async () => await invalidPost(''))
         it('should not allow blank name', async () => await invalidPost('   '))
 
         const checkTrimPost = async (name: string) => {
-          const response = (
-            await request(server)
-              .post('/api/decks')
-              .send({
-                name,
-                description: 'Deck used in e2e testing',
-                scheduler: 'LeitnerScheduler'
-              })
-              .expect(HttpStatus.CREATED)
-          ).body
+          const response = (await checkPost(name, HttpStatus.CREATED)).body
 
           expect(response.name).toBe(name.trim())
 
-          await request(server)
-            .delete('/api/decks/' + response.id)
-            .expect(HttpStatus.NO_CONTENT)
+          await agent.delete('/api/decks/' + response.id).expect(HttpStatus.NO_CONTENT)
         }
 
         it('should trim name with right padding', async () => await checkTrimPost('wrong  '))
