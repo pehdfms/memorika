@@ -21,7 +21,7 @@ export class AuthService {
       ...data,
       password: hashedPassword
     })
-    createdUser.password = undefined
+
     return createdUser
   }
 
@@ -29,7 +29,6 @@ export class AuthService {
     try {
       const user = await this.userService.getByEmail(email)
       await this.verifyPassword(password, user.password)
-      user.password = undefined
       return user
     } catch (e) {
       throw new BadRequestException('Invalid credentials!')

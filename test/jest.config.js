@@ -19,5 +19,5 @@ module.exports = {
     '@modules/(.*)': '<rootDir>/src/modules/$1'
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: './coverage'
+  coverageDirectory: './coverage',
 }

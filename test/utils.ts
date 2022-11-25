@@ -1,9 +1,12 @@
 import { QueryErrorFilter } from '@configs/filters/query-error.filter'
-import { INestApplication, ValidationPipe } from '@nestjs/common'
-import { HttpAdapterHost } from '@nestjs/core'
+import { ClassSerializerInterceptor, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpAdapterHost, Reflector } from '@nestjs/core'
+import cookieParser from 'cookie-parser'
 
 export function setupFixture(app: INestApplication) {
   const { httpAdapter } = app.get(HttpAdapterHost)
+
+  app.use(cookieParser())
 
   app.useGlobalPipes(
     new ValidationPipe({
