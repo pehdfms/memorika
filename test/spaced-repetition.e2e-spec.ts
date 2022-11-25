@@ -1,10 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import request, { SuperAgentTest } from 'supertest'
 import { SpacedRepetitionModule } from '@modules/spaced-repetition/spaced-repetition.module'
 import { MikroOrmModule } from '@mikro-orm/nestjs'
-import { HttpAdapterHost } from '@nestjs/core'
-import { QueryErrorFilter } from '@configs/filters/query-error.filter'
+import { setupFixture } from './utils'
 
 describe('Spaced Repetition Module (e2e)', () => {
   let app: INestApplication
@@ -20,19 +19,7 @@ describe('Spaced Repetition Module (e2e)', () => {
     }).compile()
 
     app = moduleFixture.createNestApplication()
-    const { httpAdapter } = app.get(HttpAdapterHost)
-
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        transformOptions: { enableImplicitConversion: true },
-        whitelist: true,
-        forbidNonWhitelisted: true
-      })
-    )
-
-    app.useGlobalFilters(new QueryErrorFilter(httpAdapter))
-    app.setGlobalPrefix('api')
+    setupFixture(app)
 
     await app.init()
 

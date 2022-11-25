@@ -25,11 +25,18 @@ export class UserService {
     return newUser
   }
 
-  async getById(id: string) {
+  async findOne(id: string): Promise<User> {
     const user = await this.userRepository.findOne({ id })
+
     if (!user) {
       throw new NotFoundException()
     }
+
     return user
+  }
+
+  async remove(id: string): Promise<void> {
+    const user = await this.findOne(id)
+    await this.userRepository.removeAndFlush(user)
   }
 }
