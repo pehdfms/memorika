@@ -67,10 +67,6 @@ describe('Identity Module (e2e)', () => {
         loginResponse = loginResponse.body
       })
 
-      it('should hide password info on login', async () => {
-        expect(loginResponse).not.toHaveProperty(password)
-      })
-
       it('should be possible to login as the created user', async () => {
         // Date truncation means it won't be an exact match, so we have to ignore the date fields
         expect({ ...loginResponse, created: undefined, updated: undefined }).toEqual({
@@ -109,6 +105,48 @@ describe('Identity Module (e2e)', () => {
       it('should only show current logged in user when logged in', async () => {
         await agent.get('/api/auth').expect(HttpStatus.UNAUTHORIZED)
       })
+    })
+
+    describe('Cleanup', () => {
+      it('should allow for user deletion', async () => {
+        await agent.delete('/api/users/' + userResponse.id).expect(HttpStatus.NO_CONTENT)
+      })
+
+      it('should delete the user', async () => {
+        await visit('users/' + userResponse.id, HttpStatus.NOT_FOUND)
+      })
+    })
+  })
+
+  describe('Sad Path', () => {
+    let userResponse: any
+
+    const email = `${randomUUID()}@testemail.com`
+    const password = 'test123'
+
+    const createUser = () => {
+      return agent.post('/api/users').send({
+        nickname: 'UniqueTestingGuy',
+        email,
+        password
+      })
+    }
+
+    it('should create an user', async () => {
+      userResponse = (await createUser().expect(HttpStatus.CREATED)).body
+    })
+
+    it('should not allow creating an user with a duplicate email', async () => {
+      await createUser().expect(HttpStatus.CONFLICT)
+    })
+
+    it('should reject invalid credentials', async () => {
+      const { email } = userResponse
+
+      await agent
+        .post('/api/auth')
+        .send({ email, password: 'wrongPassword' })
+        .expect(HttpStatus.BAD_REQUEST)
     })
 
     describe('Cleanup', () => {
