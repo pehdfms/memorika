@@ -5,7 +5,6 @@ import { getPaginationOptions } from 'src/libs/utils/pagination.utils'
 import { EntityRepository } from '@mikro-orm/core'
 import { CreateReviewDto } from '@modules/spaced-repetition/reviews/dtos/create-review.dto'
 import { Review } from './review.entity'
-import { FlashCard } from '../flash-cards/flash-card.entity'
 import { FlashCardService } from '../flash-cards/flash-card.service'
 
 @Injectable()
@@ -14,17 +13,16 @@ export class ReviewService {
 
   constructor(
     @InjectRepository(Review) private readonly reviewRepository: EntityRepository<Review>,
-    @InjectRepository(FlashCard) private readonly flashCardRepository: EntityRepository<FlashCard>,
     private readonly flashCardService: FlashCardService
   ) {}
 
   async create(review: CreateReviewDto) {
     const flashCard = await this.flashCardService.findOne(review.flashCard)
-    await this.flashCardRepository.populate(flashCard, ['deck', 'reviews'])
+    await this.flashCardService.populateAll(flashCard)
 
     const addedReview = await flashCard.submitAnswer(review.answer)
 
-    await this.flashCardRepository.persistAndFlush(flashCard)
+    await this.reviewRepository.persistAndFlush(addedReview)
 
     return addedReview
   }

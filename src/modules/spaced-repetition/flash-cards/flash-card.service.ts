@@ -62,4 +62,8 @@ export class FlashCardService {
 
     await this.flashCardRepository.removeAndFlush(flashCard)
   }
+
+  async populateAll(flashCard: FlashCard) {
+    await this.flashCardRepository.populate(flashCard, ['deck', 'reviews'])
+  }
 }
