@@ -43,37 +43,37 @@ describe('Identity Module (e2e)', () => {
     server.close()
   })
 
-  describe('Happy Path', () => {
-    let userId: string
-    let authToken: string
+  let userId: string
+  let authToken: string
 
-    describe('Login', () => {
-      const email = `${randomUUID()}@testemail.com`
-      const password = 'test123'
+  describe('Login', () => {
+    const email = `${randomUUID()}@testemail.com`
+    const password = 'test123'
 
-      it('should create an user', async () => {
-        userId = (
-          await agent
-            .post('/api/users')
-            .send({
-              nickname: 'UniqueTestingGuy',
-              email,
-              password
-            })
-            .expect(HttpStatus.CREATED)
-        ).body.id
-      })
-
-      it('should be able to authenticate', async () => {
-        const loginResponse = await agent
-          .post('/api/auth')
-          .send({ email, password })
-          .expect(HttpStatus.OK)
-
-        authToken = loginResponse.headers['set-cookie'][0]
-      })
+    it('should create an user', async () => {
+      userId = (
+        await agent
+          .post('/api/users')
+          .send({
+            nickname: 'UniqueTestingGuy',
+            email,
+            password
+          })
+          .expect(HttpStatus.CREATED)
+      ).body.id
     })
 
+    it('should be able to authenticate', async () => {
+      const loginResponse = await agent
+        .post('/api/auth')
+        .send({ email, password })
+        .expect(HttpStatus.OK)
+
+      authToken = loginResponse.headers['set-cookie'][0]
+    })
+  })
+
+  describe('Happy Path', () => {
     let deckResponse: any
     it('should create a deck', async () => {
       deckResponse = (
@@ -159,13 +159,15 @@ describe('Identity Module (e2e)', () => {
       it('should delete the review automatically', async () => {
         await visit(authToken, 'reviews/' + reviewResponse.id, HttpStatus.NOT_FOUND)
       })
+    })
+  })
 
-      it('should allow for user deletion', async () => {
-        await agent
-          .delete('/api/users/' + userId)
-          .set('Cookie', authToken)
-          .expect(HttpStatus.NO_CONTENT)
-      })
+  describe('Logout', () => {
+    it('should allow for user deletion', async () => {
+      await agent
+        .delete('/api/users/' + userId)
+        .set('Cookie', authToken)
+        .expect(HttpStatus.NO_CONTENT)
     })
   })
 })
