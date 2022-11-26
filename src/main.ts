@@ -1,8 +1,8 @@
 import { Logger } from 'nestjs-pino'
-import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core'
+import { HttpAdapterHost, NestFactory } from '@nestjs/core'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { AppModule } from './app.module'
-import { ClassSerializerInterceptor, INestApplication, ValidationPipe } from '@nestjs/common'
+import { INestApplication, ValidationPipe } from '@nestjs/common'
 import { QueryErrorFilter } from './configs/filters/query-error.filter'
 import cookieParser from 'cookie-parser'
 
@@ -27,7 +27,6 @@ async function bootstrap() {
     })
   )
   app.useGlobalFilters(new QueryErrorFilter(httpAdapter))
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))
   app.setGlobalPrefix('api')
 
   setupSwagger(app)

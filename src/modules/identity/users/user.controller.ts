@@ -6,10 +6,12 @@ import {
   HttpStatus,
   Param,
   ParseUUIDPipe,
-  Post
+  Post,
+  UseGuards
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { AuthService } from '../auth/auth.service'
+import { JwtAuthenticationGuard } from '../auth/jwt-authentication.guard'
 import { CreateUserDto } from './dtos/create-user.dto'
 import { UserService } from './user.service'
 
@@ -26,6 +28,7 @@ export class UserController {
     return this.authService.register(data)
   }
 
+  @UseGuards(JwtAuthenticationGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', ParseUUIDPipe) id: string) {

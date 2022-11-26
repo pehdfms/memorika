@@ -1,10 +1,22 @@
 import { PaginationQuery } from '@libs/types/pagination'
-import { Controller, Get, Post, Body, Param, ParseUUIDPipe, Logger, Query } from '@nestjs/common'
+import { JwtAuthenticationGuard } from '@modules/identity/auth/jwt-authentication.guard'
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ParseUUIDPipe,
+  Logger,
+  Query,
+  UseGuards
+} from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { ReviewService } from '../reviews/review.service'
 import { CreateReviewDto } from './dtos/create-review.dto'
 
 @ApiTags('Spaced Repetition')
+@UseGuards(JwtAuthenticationGuard)
 @Controller('reviews')
 export class ReviewController {
   private readonly logger = new Logger(ReviewController.name)

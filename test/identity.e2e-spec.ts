@@ -44,15 +44,15 @@ describe('Identity Module (e2e)', () => {
           .send({
             nickname: 'UniqueTestingGuy',
             email: `${randomUUID()}@testemail.com`,
-            password: password
+            password
           })
           .expect(HttpStatus.CREATED)
       ).body
     })
 
+    let authToken: string
     describe('Login', () => {
       let loginResponse: any
-      let authToken: string
 
       it('should be able to authenticate', async () => {
         const { email } = userResponse
@@ -60,14 +60,17 @@ describe('Identity Module (e2e)', () => {
         loginResponse = await agent
           .post('/api/auth')
           .send({ email, password })
-          .set(['hello'])
           .expect(HttpStatus.OK)
 
         authToken = loginResponse.headers['set-cookie'][0]
         loginResponse = loginResponse.body
       })
 
-      it('should be possible to login as the created user', async () => {
+      it('should not show password on login', () => {
+        expect(loginResponse).not.toHaveProperty('password')
+      })
+
+      it('should be possible to login as the created user', () => {
         // Date truncation means it won't be an exact match, so we have to ignore the date fields
         expect({ ...loginResponse, created: undefined, updated: undefined }).toEqual({
           ...userResponse,
@@ -78,12 +81,10 @@ describe('Identity Module (e2e)', () => {
 
       it('should show the created user as being logged in', async () => {
         const whoAmIResponse = (
-          await agent
-            .get('/api/auth')
-            .set('Cookie', authToken)
-            .withCredentials()
-            .expect(HttpStatus.OK)
+          await agent.get('/api/auth').set('Cookie', authToken).expect(HttpStatus.OK)
         ).body
+
+        expect(whoAmIResponse).not.toHaveProperty('password')
 
         expect({ ...whoAmIResponse, created: undefined, updated: undefined }).toEqual({
           ...userResponse,
@@ -109,7 +110,10 @@ describe('Identity Module (e2e)', () => {
 
     describe('Cleanup', () => {
       it('should allow for user deletion', async () => {
-        await agent.delete('/api/users/' + userResponse.id).expect(HttpStatus.NO_CONTENT)
+        await agent
+          .delete('/api/users/' + userResponse.id)
+          .set('Cookie', authToken)
+          .expect(HttpStatus.NO_CONTENT)
       })
 
       it('should delete the user', async () => {
@@ -136,13 +140,19 @@ describe('Identity Module (e2e)', () => {
       userResponse = (await createUser().expect(HttpStatus.CREATED)).body
     })
 
+    let authToken: string
+    let loginResponse: any
+    it('should be able to authenticate', async () => {
+      loginResponse = await agent.post('/api/auth').send({ email, password }).expect(HttpStatus.OK)
+      authToken = loginResponse.headers['set-cookie'][0]
+      loginResponse = loginResponse.body
+    })
+
     it('should not allow creating an user with a duplicate email', async () => {
       await createUser().expect(HttpStatus.CONFLICT)
     })
 
     it('should reject invalid credentials', async () => {
-      const { email } = userResponse
-
       await agent
         .post('/api/auth')
         .send({ email, password: 'wrongPassword' })
@@ -151,11 +161,10 @@ describe('Identity Module (e2e)', () => {
 
     describe('Cleanup', () => {
       it('should allow for user deletion', async () => {
-        await agent.delete('/api/users/' + userResponse.id).expect(HttpStatus.NO_CONTENT)
-      })
-
-      it('should delete the user', async () => {
-        await visit('users/' + userResponse.id, HttpStatus.NOT_FOUND)
+        await agent
+          .delete('/api/users/' + userResponse.id)
+          .set('Cookie', authToken)
+          .expect(HttpStatus.NO_CONTENT)
       })
     })
   })

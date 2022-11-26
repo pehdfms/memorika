@@ -1,3 +1,4 @@
+import { JwtAuthenticationGuard } from '@modules/identity/auth/jwt-authentication.guard'
 import {
   Controller,
   Get,
@@ -10,7 +11,8 @@ import {
   Logger,
   Query,
   HttpStatus,
-  HttpCode
+  HttpCode,
+  UseGuards
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { FlashCardService } from '../flash-cards/flash-card.service'
@@ -19,6 +21,7 @@ import { PaginatedFlashCardQuery } from './dtos/paginated-flash-card-query.dto'
 import { UpdateFlashCardDto } from './dtos/update-flash-card.dto'
 
 @ApiTags('Spaced Repetition')
+@UseGuards(JwtAuthenticationGuard)
 @Controller('flash-cards')
 export class FlashCardController {
   private readonly logger = new Logger(FlashCardController.name)

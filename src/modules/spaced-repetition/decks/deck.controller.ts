@@ -1,4 +1,5 @@
 import { PaginationQuery } from '@libs/types/pagination'
+import { JwtAuthenticationGuard } from '@modules/identity/auth/jwt-authentication.guard'
 import {
   Controller,
   Get,
@@ -11,7 +12,8 @@ import {
   Logger,
   Query,
   HttpCode,
-  HttpStatus
+  HttpStatus,
+  UseGuards
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { DeckService } from '../decks/deck.service'
@@ -19,6 +21,7 @@ import { CreateDeckDto } from './dtos/create-deck.dto'
 import { UpdateDeckDto } from './dtos/update-deck.dto'
 
 @ApiTags('Spaced Repetition')
+@UseGuards(JwtAuthenticationGuard)
 @Controller('decks')
 export class DeckController {
   private readonly logger = new Logger(DeckController.name)

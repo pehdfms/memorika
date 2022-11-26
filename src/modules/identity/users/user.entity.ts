@@ -1,6 +1,5 @@
 import { AuditedEntity } from '@libs/types/entity'
 import { Entity, Property } from '@mikro-orm/core'
-import { Exclude } from 'class-transformer'
 
 @Entity()
 export class User extends AuditedEntity {
@@ -10,7 +9,6 @@ export class User extends AuditedEntity {
   @Property({ unique: true })
   email: string
 
-  @Property()
-  @Exclude()
+  @Property({ hidden: true })
   password: string
 }
